@@ -1,8 +1,6 @@
 # WatchTool
 
 This is the public repo for the WatchTool extension
-
-// Add a comment at the top of your main.js
 /**
  * WatchTool Extension
  * 
