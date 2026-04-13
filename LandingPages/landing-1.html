@@ -1,0 +1,1662 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Watch Later — Feature Specification</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;1,9..144,300&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      :root {
+        --red: #e5341a;
+        --red-soft: #fff0ed;
+        --red-mid: #fdddd8;
+        --amber: #d97706;
+        --amber-soft: #fffbeb;
+        --green: #16a34a;
+        --green-soft: #f0fdf4;
+        --blue: #2563eb;
+        --blue-soft: #eff6ff;
+        --purple: #7c3aed;
+        --purple-soft: #f5f3ff;
+        --ink: #1a1a1a;
+        --ink-2: #3d3d3d;
+        --ink-3: #6b6b6b;
+        --ink-4: #9b9b9b;
+        --rule: #e8e5df;
+        --bg: #faf9f7;
+        --white: #ffffff;
+        --paper: #f5f3ef;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        font-family: "DM Sans", sans-serif;
+        background: var(--bg);
+        color: var(--ink);
+        font-size: 14px;
+        line-height: 1.6;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      /* ── COVER PAGE ── */
+      .cover {
+        min-height: 100vh;
+        background: var(--ink);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        padding: 60px 72px;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .cover::before {
+        content: "";
+        position: absolute;
+        top: -120px;
+        right: -120px;
+        width: 500px;
+        height: 500px;
+        background: radial-gradient(
+          circle,
+          rgba(229, 52, 26, 0.18) 0%,
+          transparent 70%
+        );
+        pointer-events: none;
+      }
+
+      .cover::after {
+        content: "";
+        position: absolute;
+        bottom: -80px;
+        left: 40px;
+        width: 320px;
+        height: 320px;
+        background: radial-gradient(
+          circle,
+          rgba(229, 52, 26, 0.08) 0%,
+          transparent 70%
+        );
+        pointer-events: none;
+      }
+
+      .cover-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+      }
+
+      .cover-logo {
+        font-family: "DM Mono", monospace;
+        font-size: 11px;
+        color: rgba(255, 255, 255, 0.35);
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+
+      .cover-version {
+        font-family: "DM Mono", monospace;
+        font-size: 11px;
+        color: rgba(255, 255, 255, 0.35);
+        letter-spacing: 0.08em;
+      }
+
+      .cover-main {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: 80px 0 40px;
+      }
+
+      .cover-eyebrow {
+        font-family: "DM Mono", monospace;
+        font-size: 11px;
+        color: var(--red);
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        margin-bottom: 24px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .cover-eyebrow::before {
+        content: "";
+        display: inline-block;
+        width: 24px;
+        height: 1px;
+        background: var(--red);
+      }
+
+      .cover-title {
+        font-family: "Fraunces", serif;
+        font-size: clamp(52px, 7vw, 88px);
+        font-weight: 300;
+        color: #fff;
+        line-height: 1;
+        letter-spacing: -0.02em;
+        margin-bottom: 8px;
+      }
+      .cover-title em {
+        font-style: italic;
+        color: rgba(255, 255, 255, 0.45);
+      }
+
+      .cover-subtitle {
+        font-family: "DM Sans", sans-serif;
+        font-size: 16px;
+        font-weight: 300;
+        color: rgba(255, 255, 255, 0.45);
+        margin-top: 20px;
+        max-width: 480px;
+        line-height: 1.7;
+      }
+
+      .cover-bottom {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+      }
+
+      .cover-meta {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+      .cover-meta-label {
+        font-family: "DM Mono", monospace;
+        font-size: 10px;
+        color: rgba(255, 255, 255, 0.25);
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+      }
+      .cover-meta-value {
+        font-size: 13px;
+        color: rgba(255, 255, 255, 0.55);
+        font-weight: 300;
+      }
+
+      .cover-stats {
+        display: flex;
+        gap: 40px;
+      }
+      .cover-stat {
+        text-align: right;
+      }
+      .cover-stat-num {
+        font-family: "Fraunces", serif;
+        font-size: 32px;
+        font-weight: 300;
+        color: #fff;
+        line-height: 1;
+      }
+      .cover-stat-label {
+        font-family: "DM Mono", monospace;
+        font-size: 10px;
+        color: rgba(255, 255, 255, 0.3);
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        margin-top: 4px;
+      }
+
+      /* ── MAIN DOCUMENT ── */
+      .document {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 80px 60px 120px;
+      }
+
+      /* Section headers */
+      .chapter {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin: 64px 0 32px;
+        padding-bottom: 16px;
+        border-bottom: 1.5px solid var(--ink);
+      }
+      .chapter:first-of-type {
+        margin-top: 0;
+      }
+
+      .chapter-num {
+        font-family: "DM Mono", monospace;
+        font-size: 11px;
+        color: var(--ink-4);
+        letter-spacing: 0.1em;
+        flex-shrink: 0;
+      }
+      .chapter-title {
+        font-family: "Fraunces", serif;
+        font-size: 28px;
+        font-weight: 400;
+        color: var(--ink);
+        letter-spacing: -0.01em;
+        line-height: 1.2;
+        flex: 1;
+      }
+      .chapter-badge {
+        font-family: "DM Mono", monospace;
+        font-size: 10px;
+        padding: 3px 10px;
+        border-radius: 2px;
+        font-weight: 500;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
+      .cb-free {
+        background: var(--green-soft);
+        color: var(--green);
+      }
+      .cb-pro {
+        background: var(--purple-soft);
+        color: var(--purple);
+      }
+      .cb-both {
+        background: var(--paper);
+        color: var(--ink-3);
+        border: 1px solid var(--rule);
+      }
+
+      /* Feature rows — Pages table style */
+      .feat-block {
+        margin-bottom: 48px;
+      }
+
+      .feat-header {
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr 1.4fr;
+        gap: 0;
+        padding: 8px 0;
+        border-bottom: 1px solid var(--rule);
+        margin-bottom: 0;
+      }
+      .fh {
+        font-family: "DM Mono", monospace;
+        font-size: 10px;
+        color: var(--ink-4);
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        padding: 0 16px 0 0;
+      }
+
+      .feat-row {
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr 1.4fr;
+        gap: 0;
+        padding: 18px 0;
+        border-bottom: 1px solid var(--rule);
+        align-items: start;
+        transition: background 0.1s;
+      }
+      .feat-row:hover {
+        background: var(--paper);
+        margin: 0 -20px;
+        padding: 18px 20px;
+        border-radius: 6px;
+      }
+
+      .feat-name-col {
+        padding-right: 20px;
+      }
+      .feat-name {
+        font-size: 18px;
+        font-weight: 500;
+        color: var(--ink);
+        margin-bottom: 4px;
+      }
+      .feat-desc {
+        font-size: 15px;
+        color: var(--ink-3);
+        line-height: 1.55;
+      }
+
+      .feat-status {
+        padding-right: 12px;
+      }
+      .status-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        font-family: "DM Mono", monospace;
+        font-size: 10px;
+        font-weight: 500;
+        padding: 3px 9px;
+        border-radius: 2px;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        white-space: nowrap;
+      }
+      .sp-build {
+        background: #eff6ff;
+        color: #1d4ed8;
+      }
+      .sp-dom {
+        background: #f0fdf4;
+        color: #15803d;
+      }
+      .sp-caution {
+        background: #fffbeb;
+        color: #b45309;
+      }
+      .sp-paid {
+        background: #f5f3ff;
+        color: #6d28d9;
+      }
+
+      .feat-tier {
+        padding-right: 12px;
+      }
+      .tier-tag {
+        font-family: "DM Mono", monospace;
+        font-size: 10px;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        font-weight: 500;
+      }
+      .tt-free {
+        color: var(--green);
+      }
+      .tt-pro {
+        color: var(--purple);
+      }
+      .tt-frepro {
+        color: var(--amber);
+      }
+
+      .feat-impl {
+        font-size: 12px;
+        color: var(--ink-3);
+        line-height: 1.55;
+      }
+      .feat-impl code {
+        font-family: "DM Mono", monospace;
+        font-size: 11px;
+        background: var(--paper);
+        border: 1px solid var(--rule);
+        padding: 1px 5px;
+        border-radius: 3px;
+        color: var(--ink-2);
+      }
+
+      /* Risk indicators */
+      .risk-row {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-top: 5px;
+      }
+      .risk-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        flex-shrink: 0;
+      }
+      .risk-text {
+        font-family: "DM Mono", monospace;
+        font-size: 10px;
+        letter-spacing: 0.04em;
+      }
+      .risk-low {
+        color: var(--green);
+      }
+      .risk-med {
+        color: var(--amber);
+      }
+      .risk-high {
+        color: var(--red);
+      }
+
+      /* Summary scorecard */
+      .scorecard {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1px;
+        background: var(--rule);
+        border: 1px solid var(--rule);
+        border-radius: 8px;
+        overflow: hidden;
+        margin: 40px 0;
+      }
+      .sc-cell {
+        background: var(--white);
+        padding: 24px 20px;
+        text-align: center;
+      }
+      .sc-num {
+        font-family: "Fraunces", serif;
+        font-size: 40px;
+        font-weight: 300;
+        color: var(--ink);
+        line-height: 1;
+        margin-bottom: 6px;
+      }
+      .sc-label {
+        font-family: "DM Mono", monospace;
+        font-size: 10px;
+        color: var(--ink-4);
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+      }
+
+      /* Architecture section */
+      .arch-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin: 24px 0;
+      }
+      .arch-card {
+        background: var(--white);
+        border: 1px solid var(--rule);
+        border-radius: 8px;
+        padding: 20px 22px;
+      }
+      .arch-card-title {
+        font-family: "Fraunces", serif;
+        font-size: 16px;
+        font-weight: 400;
+        color: var(--ink);
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .arch-icon {
+        width: 28px;
+        height: 28px;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 13px;
+        flex-shrink: 0;
+      }
+      .arch-list {
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+      .arch-list li {
+        font-size: 12px;
+        color: var(--ink-3);
+        padding-left: 14px;
+        position: relative;
+        line-height: 1.5;
+      }
+      .arch-list li::before {
+        content: "—";
+        position: absolute;
+        left: 0;
+        color: var(--ink-4);
+      }
+      .arch-list code {
+        font-family: "DM Mono", monospace;
+        font-size: 11px;
+        background: var(--paper);
+        border: 1px solid var(--rule);
+        padding: 1px 4px;
+        border-radius: 2px;
+        color: var(--ink-2);
+      }
+
+      /* Callout boxes */
+      .callout {
+        border-left: 3px solid var(--red);
+        background: var(--red-soft);
+        padding: 16px 20px;
+        border-radius: 0 6px 6px 0;
+        margin: 24px 0;
+      }
+      .callout-title {
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--ink);
+        margin-bottom: 4px;
+      }
+      .callout-body {
+        font-size: 12px;
+        color: var(--ink-3);
+        line-height: 1.6;
+      }
+
+      .callout.green {
+        border-color: var(--green);
+        background: var(--green-soft);
+      }
+      .callout.amber {
+        border-color: var(--amber);
+        background: var(--amber-soft);
+      }
+
+      /* Timeline / sprint plan */
+      .sprint-grid {
+        display: grid;
+        grid-template-columns: 100px 1fr;
+        gap: 0;
+      }
+      .sprint-row {
+        display: contents;
+      }
+      .sprint-week {
+        font-family: "DM Mono", monospace;
+        font-size: 11px;
+        color: var(--ink-4);
+        letter-spacing: 0.06em;
+        padding: 20px 20px 20px 0;
+        border-right: 1px solid var(--rule);
+        text-align: right;
+        line-height: 1.4;
+        position: relative;
+      }
+      .sprint-week::after {
+        content: "";
+        position: absolute;
+        right: -5px;
+        top: 26px;
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+        background: var(--white);
+        border: 1.5px solid var(--rule);
+      }
+      .sprint-week.active::after {
+        background: var(--red);
+        border-color: var(--red);
+      }
+
+      .sprint-content {
+        padding: 18px 0 18px 24px;
+        border-bottom: 1px solid var(--rule);
+      }
+      .sprint-title {
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--ink);
+        margin-bottom: 6px;
+      }
+      .sprint-items {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+        margin-top: 8px;
+      }
+      .sprint-item {
+        font-family: "DM Mono", monospace;
+        font-size: 10px;
+        padding: 3px 8px;
+        border-radius: 2px;
+        background: var(--paper);
+        color: var(--ink-3);
+        border: 1px solid var(--rule);
+        letter-spacing: 0.04em;
+      }
+      .sprint-item.mvp {
+        background: #eff6ff;
+        color: #1d4ed8;
+        border-color: #bfdbfe;
+      }
+      .sprint-item.pro {
+        background: #f5f3ff;
+        color: #6d28d9;
+        border-color: #ddd6fe;
+      }
+
+      /* Divider */
+      .divider {
+        border: none;
+        border-top: 1px solid var(--rule);
+        margin: 48px 0;
+      }
+
+      /* Page number / footer */
+      .doc-footer {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: rgba(250, 249, 247, 0.92);
+        backdrop-filter: blur(8px);
+        border-top: 1px solid var(--rule);
+        padding: 10px 60px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        z-index: 100;
+      }
+      .footer-brand {
+        font-family: "DM Mono", monospace;
+        font-size: 10px;
+        color: var(--ink-4);
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+      }
+      .footer-nav {
+        display: flex;
+        gap: 24px;
+      }
+      .footer-nav a {
+        font-family: "DM Mono", monospace;
+        font-size: 10px;
+        color: var(--ink-4);
+        text-decoration: none;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        transition: color 0.15s;
+      }
+      .footer-nav a:hover {
+        color: var(--ink);
+      }
+
+      /* Print / A4 feel */
+      @media print {
+        .doc-footer {
+          display: none;
+        }
+        .cover {
+          page-break-after: always;
+        }
+        .chapter {
+          page-break-before: avoid;
+        }
+      }
+
+      /* Intro paragraph */
+      .intro {
+        font-family: "Fraunces", serif;
+        font-size: 20px;
+        font-weight: 300;
+        font-style: italic;
+        color: var(--ink-2);
+        line-height: 1.6;
+        max-width: 680px;
+        margin-bottom: 40px;
+        border-left: 2px solid var(--red);
+        padding-left: 24px;
+      }
+
+      /* Legend */
+      .legend {
+        display: flex;
+        gap: 24px;
+        flex-wrap: wrap;
+        margin: 24px 0;
+        padding: 16px 20px;
+        background: var(--paper);
+        border-radius: 6px;
+        border: 1px solid var(--rule);
+      }
+      .leg {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 12px;
+        color: var(--ink-3);
+      }
+      .leg-pill {
+        font-family: "DM Mono", monospace;
+        font-size: 9px;
+        padding: 2px 6px;
+        border-radius: 2px;
+        font-weight: 500;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- ═══════════ COVER ═══════════ -->
+    <div class="cover">
+      <div class="cover-top">
+        <div class="cover-logo">Watch Later Extension</div>
+        <div class="cover-version">v1.0 MVP Spec · March 2026</div>
+      </div>
+
+      <div class="cover-main">
+        <div class="cover-eyebrow">Feature Specification Document</div>
+        <div class="cover-title">
+          Watch<br />
+          <em>Later</em><br />
+          Manager
+        </div>
+        <div class="cover-subtitle">
+          A complete technical and product specification for building the
+          definitive YouTube Watch Later Chrome extension — covering every
+          feature, build method, API constraint, and risk.
+        </div>
+      </div>
+
+      <div class="cover-bottom">
+        <div class="cover-meta">
+          <div class="cover-meta-label">Status</div>
+          <div class="cover-meta-value">Pre-development · Ready to build</div>
+        </div>
+        <div class="cover-stats">
+          <div class="cover-stat">
+            <div class="cover-stat-num">14</div>
+            <div class="cover-stat-label">Total Features</div>
+          </div>
+          <div class="cover-stat">
+            <div class="cover-stat-num">9</div>
+            <div class="cover-stat-label">MVP · Free</div>
+          </div>
+          <div class="cover-stat">
+            <div class="cover-stat-num">5</div>
+            <div class="cover-stat-label">Pro Tier</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════ DOCUMENT ═══════════ -->
+    <div class="document">
+      <p class="intro">
+        Every feature mapped to how it's built, what API it touches, what the
+        risk is, and which tier it belongs to. A single source of truth before
+        you write line one of code.
+      </p>
+
+      <!-- Scorecard -->
+      <div class="scorecard">
+        <div class="sc-cell">
+          <div class="sc-num" style="color: #15803d">11</div>
+          <div class="sc-label">DOM-only features<br />(zero API needed)</div>
+        </div>
+        <div class="sc-cell">
+          <div class="sc-num" style="color: #b45309">2</div>
+          <div class="sc-label">Innertube API<br />(unofficial, optional)</div>
+        </div>
+        <div class="sc-cell">
+          <div class="sc-num" style="color: #e5341a">0</div>
+          <div class="sc-label">Official YouTube API<br />(blocked for WL)</div>
+        </div>
+        <div class="sc-cell">
+          <div class="sc-num" style="color: #6d28d9">5</div>
+          <div class="sc-label">Pro-gated features<br />(paid tier)</div>
+        </div>
+      </div>
+
+      <div class="callout">
+        <div class="callout-title">
+          Critical constraint — read before building anything
+        </div>
+        <div class="callout-body">
+          YouTube completely blocked Watch Later from the official Data API v3
+          in 2016. <code>playlistItems.list(playlistId:"WL")</code> returns
+          empty always. Every feature in this spec is built via DOM manipulation
+          inside a content script — not the official API. This is how every
+          successful Watch Later extension works today.
+        </div>
+      </div>
+
+      <!-- Legend -->
+      <div class="legend">
+        <div class="leg">
+          <span class="leg-pill sp-dom">DOM</span> Content script reads page
+          HTML directly — most stable method
+        </div>
+        <div class="leg">
+          <span class="leg-pill sp-build">Innertube</span> YouTube's internal
+          API — unofficial but widely used
+        </div>
+        <div class="leg">
+          <span class="leg-pill sp-paid">Pro</span> Requires paid subscription
+          to unlock
+        </div>
+        <div class="leg">
+          <span class="leg-pill sp-caution">Caution</span> External dependency
+          or complexity flag
+        </div>
+      </div>
+
+      <!-- ─── SECTION 1 ─── -->
+      <div class="chapter">
+        <div class="chapter-num">01</div>
+        <div class="chapter-title">Core Management</div>
+        <div class="chapter-badge cb-free">Free Tier</div>
+      </div>
+
+      <div class="feat-block">
+        <div class="feat-header">
+          <div class="fh">Feature</div>
+          <div class="fh">Build Method</div>
+          <div class="fh">Tier</div>
+          <div class="fh">Implementation Notes</div>
+        </div>
+
+        <div class="feat-row">
+          <div class="feat-name-col">
+            <div class="feat-name">Bulk Select & Delete</div>
+            <div class="feat-desc">
+              Checkbox multi-select on WL page. Select all, select by channel,
+              select range. Delete in one click. Bypass one-by-one UX pain.
+            </div>
+            <div class="risk-row">
+              <div class="risk-dot" style="background: #16a34a"></div>
+              <span class="risk-text risk-low">Low risk</span>
+            </div>
+          </div>
+          <div class="feat-status">
+            <span class="status-pill sp-dom">DOM</span>
+          </div>
+          <div class="feat-tier">
+            <span class="tier-tag tt-free">Free</span>
+          </div>
+          <div class="feat-impl">
+            Inject checkboxes onto
+            <code>ytd-playlist-video-renderer</code> elements. Simulate
+            <code>click</code> on YouTube's native remove button per video.
+            Throttle to 2–3 deletions/sec. No API call required.
+          </div>
+        </div>
+
+        <div class="feat-row">
+          <div class="feat-name-col">
+            <div class="feat-name">Auto-Remove Watched Videos</div>
+            <div class="feat-desc">
+              Automatically remove from WL once watched past a configurable
+              threshold (80%, 95%, 100%). Runs silently in the background.
+            </div>
+            <div class="risk-row">
+              <div class="risk-dot" style="background: #16a34a"></div>
+              <span class="risk-text risk-low"
+                >Low risk — proven by existing extensions</span
+              >
+            </div>
+          </div>
+          <div class="feat-status">
+            <span class="status-pill sp-dom">DOM</span>
+          </div>
+          <div class="feat-tier">
+            <span class="tier-tag tt-free">Free</span>
+          </div>
+          <div class="feat-impl">
+            Listen to <code>video.ontimeupdate</code> via content script.
+            Calculate <code>currentTime / duration</code>. When threshold met,
+            trigger DOM delete. Store video ID in
+            <code>chrome.storage.local</code> to prevent re-removal.
+          </div>
+        </div>
+
+        <div class="feat-row">
+          <div class="feat-name-col">
+            <div class="feat-name">Filter by Channel</div>
+            <div class="feat-desc">
+              Show only videos from a selected channel. Combine with bulk
+              actions — "delete all from [channel]". Zero competitors do filter
+              + bulk together.
+            </div>
+            <div class="risk-row">
+              <div class="risk-dot" style="background: #16a34a"></div>
+              <span class="risk-text risk-low">Very low risk</span>
+            </div>
+          </div>
+          <div class="feat-status">
+            <span class="status-pill sp-dom">DOM</span>
+          </div>
+          <div class="feat-tier">
+            <span class="tier-tag tt-free">Free</span>
+          </div>
+          <div class="feat-impl">
+            Read <code>#channel-name</code> text from each video card. Build
+            dropdown of unique channels from DOM. Apply
+            <code>display:none</code> via Trusted Types policy to hide
+            non-matching rows. No re-fetch needed.
+          </div>
+        </div>
+
+        <div class="feat-row">
+          <div class="feat-name-col">
+            <div class="feat-name">Sort by Duration / Date / Channel</div>
+            <div class="feat-desc">
+              Re-sort the WL view. Duration (short→long), date added
+              (newest/oldest), channel name A–Z. Persists across sessions.
+            </div>
+            <div class="risk-row">
+              <div class="risk-dot" style="background: #16a34a"></div>
+              <span class="risk-text risk-low">Very low risk</span>
+            </div>
+          </div>
+          <div class="feat-status">
+            <span class="status-pill sp-dom">DOM</span>
+          </div>
+          <div class="feat-tier">
+            <span class="tier-tag tt-free">Free</span>
+          </div>
+          <div class="feat-impl">
+            Parse duration string (<code>MM:SS</code> → seconds) and channel
+            name from DOM. Collect all
+            <code>ytd-playlist-video-renderer</code> nodes, sort array,
+            re-append to parent in new order. Save preference in
+            <code>chrome.storage.sync</code>.
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── SECTION 2 ─── -->
+      <div class="chapter">
+        <div class="chapter-num">02</div>
+        <div class="chapter-title">Search & Discovery</div>
+        <div class="chapter-badge cb-free">Free Tier</div>
+      </div>
+
+      <div class="feat-block">
+        <div class="feat-header">
+          <div class="fh">Feature</div>
+          <div class="fh">Build Method</div>
+          <div class="fh">Tier</div>
+          <div class="fh">Implementation Notes</div>
+        </div>
+
+        <div class="feat-row">
+          <div class="feat-name-col">
+            <div class="feat-name">Search Within Watch Later</div>
+            <div class="feat-desc">
+              Full text search across all WL video titles and channels. Results
+              appear instantly. YouTube has zero native search inside WL.
+            </div>
+            <div class="risk-row">
+              <div class="risk-dot" style="background: #16a34a"></div>
+              <span class="risk-text risk-low">Very low risk</span>
+            </div>
+          </div>
+          <div class="feat-status">
+            <span class="status-pill sp-dom">DOM</span>
+          </div>
+          <div class="feat-tier">
+            <span class="tier-tag tt-free">Free</span>
+          </div>
+          <div class="feat-impl">
+            On WL page load, index all titles + channel names from DOM into
+            memory. Inject search input above the list. On
+            <code>input</code> event, filter visible rows. For 500+ item lists,
+            use a virtual scroll approach to avoid DOM bloat.
+          </div>
+        </div>
+
+        <div class="feat-row">
+          <div class="feat-name-col">
+            <div class="feat-name">Duration-Aware Session Builder</div>
+            <div class="feat-desc">
+              "I have 30 mins" → auto-assembles a watch queue from WL that fits
+              the time budget. Shows estimated total runtime. Unique — no
+              competitor has this.
+            </div>
+            <div class="risk-row">
+              <div class="risk-dot" style="background: #16a34a"></div>
+              <span class="risk-text risk-low">Low risk</span>
+            </div>
+          </div>
+          <div class="feat-status">
+            <span class="status-pill sp-dom">DOM</span>
+          </div>
+          <div class="feat-tier">
+            <span class="tier-tag tt-frepro">Free → Pro</span>
+          </div>
+          <div class="feat-impl">
+            Parse all durations from DOM into seconds. User enters time budget
+            (minutes). Greedy-select videos to fill budget. Display selected
+            queue with running total. Free: up to 30-min sessions. Pro:
+            unlimited + priority-aware selection.
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── SECTION 3 ─── -->
+      <div class="chapter">
+        <div class="chapter-num">03</div>
+        <div class="chapter-title">Stats & Intelligence</div>
+        <div class="chapter-badge cb-both">Free + Pro</div>
+      </div>
+
+      <div class="feat-block">
+        <div class="feat-header">
+          <div class="fh">Feature</div>
+          <div class="fh">Build Method</div>
+          <div class="fh">Tier</div>
+          <div class="fh">Implementation Notes</div>
+        </div>
+
+        <div class="feat-row">
+          <div class="feat-name-col">
+            <div class="feat-name">WL Health Dashboard</div>
+            <div class="feat-desc">
+              On first install: total videos, total watch time in hours, top 3
+              channels, oldest saved video. The "wow moment" that drives sharing
+              and word-of-mouth.
+            </div>
+            <div class="risk-row">
+              <div class="risk-dot" style="background: #d97706"></div>
+              <span class="risk-text risk-med"
+                >Medium — "date added" needs workaround</span
+              >
+            </div>
+          </div>
+          <div class="feat-status">
+            <span class="status-pill sp-dom">DOM</span>
+          </div>
+          <div class="feat-tier">
+            <span class="tier-tag tt-free">Free</span>
+          </div>
+          <div class="feat-impl">
+            Compute totals from DOM metadata. Duration sum → hours. Channel
+            frequency count → top channels. Date added: use
+            <code>firstSeen</code> timestamp stored by extension on first WL
+            scan. Show in popup panel on ext icon click.
+          </div>
+        </div>
+
+        <div class="feat-row">
+          <div class="feat-name-col">
+            <div class="feat-name">Stale Video Detection</div>
+            <div class="feat-desc">
+              Flag videos saved 6+ months ago not yet watched. Show "stale"
+              badge on thumbnails. One-click bulk cleanup. Completely unbuilt by
+              any competitor.
+            </div>
+            <div class="risk-row">
+              <div class="risk-dot" style="background: #16a34a"></div>
+              <span class="risk-text risk-low"
+                >Low risk with firstSeen approach</span
+              >
+            </div>
+          </div>
+          <div class="feat-status">
+            <span class="status-pill sp-dom">DOM</span>
+          </div>
+          <div class="feat-tier">
+            <span class="tier-tag tt-free">Free</span>
+          </div>
+          <div class="feat-impl">
+            On each WL page visit, record
+            <code>{ videoId, firstSeen: Date.now() }</code> in
+            <code>chrome.storage.local</code> for new videos. Compare age
+            threshold (user-configurable: 3/6/12 months). Inject badge overlay
+            on thumbnail. Stale bulk-delete filters by age.
+          </div>
+        </div>
+
+        <div class="feat-row">
+          <div class="feat-name-col">
+            <div class="feat-name">AI Topic Auto-Grouping</div>
+            <div class="feat-desc">
+              Semantic clusters of your WL — "React tutorials (14)", "Travel
+              vlogs (8)", "Finance (11)". No setup. Auto-named groups.
+              Collapsible sections within WL.
+            </div>
+            <div class="risk-row">
+              <div class="risk-dot" style="background: #16a34a"></div>
+              <span class="risk-text risk-low"
+                >Low risk — titles only, no video content</span
+              >
+            </div>
+          </div>
+          <div class="feat-status">
+            <span class="status-pill sp-caution">AI API</span>
+          </div>
+          <div class="feat-tier"><span class="tier-tag tt-pro">Pro</span></div>
+          <div class="feat-impl">
+            Collect all video titles from DOM. Send to Claude Haiku /
+            GPT-4o-mini for clustering (cheap — 1000 titles ≈ 10K tokens ≈
+            $0.001). Or use <code>transformers.js</code> for on-device
+            embeddings (zero cost, zero data sent). Cache clusters in
+            <code>IndexedDB</code>.
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── SECTION 4 ─── -->
+      <div class="chapter">
+        <div class="chapter-num">04</div>
+        <div class="chapter-title">Quick-Add UX</div>
+        <div class="chapter-badge cb-free">Free Tier</div>
+      </div>
+
+      <div class="feat-block">
+        <div class="feat-header">
+          <div class="fh">Feature</div>
+          <div class="fh">Build Method</div>
+          <div class="fh">Tier</div>
+          <div class="fh">Implementation Notes</div>
+        </div>
+
+        <div class="feat-row">
+          <div class="feat-name-col">
+            <div class="feat-name">Always-Visible WL Button on Thumbnails</div>
+            <div class="feat-desc">
+              YouTube removed the clock icon. Bring it back — WL button appears
+              on hover on every thumbnail. Works on homepage, search, channel
+              pages, subscriptions feed.
+            </div>
+            <div class="risk-row">
+              <div class="risk-dot" style="background: #d97706"></div>
+              <span class="risk-text risk-med"
+                >Medium — Trusted Types compliance required</span
+              >
+            </div>
+          </div>
+          <div class="feat-status">
+            <span class="status-pill sp-dom">DOM</span>
+          </div>
+          <div class="feat-tier">
+            <span class="tier-tag tt-free">Free</span>
+          </div>
+          <div class="feat-impl">
+            Use <code>MutationObserver</code> to detect thumbnail renders across
+            all YT pages. Inject button via
+            <code>trustedTypes.createPolicy()</code> — mandatory since July
+            2024. On click, call YouTube's internal save-to-WL endpoint using
+            the user's active session cookie. Handle CSRF token.
+          </div>
+        </div>
+
+        <div class="feat-row">
+          <div class="feat-name-col">
+            <div class="feat-name">Save Entire Playlist to WL</div>
+            <div class="feat-desc">
+              When viewing any YouTube playlist, inject "Save all to Watch
+              Later" button. Currently impossible natively — you can only add
+              one at a time.
+            </div>
+            <div class="risk-row">
+              <div class="risk-dot" style="background: #d97706"></div>
+              <span class="risk-text risk-med"
+                >Medium — rate limiting risk on large playlists</span
+              >
+            </div>
+          </div>
+          <div class="feat-status">
+            <span class="status-pill sp-dom">DOM</span>
+          </div>
+          <div class="feat-tier">
+            <span class="tier-tag tt-free">Free</span>
+          </div>
+          <div class="feat-impl">
+            On <code>/playlist?list=</code> pages, read all
+            <code>videoId</code> values from DOM. Loop with 1 request/second
+            throttle calling YouTube's internal WL-add endpoint. Show progress
+            indicator ("Saving 12/47…"). Cap at 100 videos for free, unlimited
+            for Pro.
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── SECTION 5 ─── -->
+      <div class="chapter">
+        <div class="chapter-num">05</div>
+        <div class="chapter-title">Pro Tier — Power Features</div>
+        <div class="chapter-badge cb-pro">Pro Only</div>
+      </div>
+
+      <div class="callout amber">
+        <div class="callout-title">These features are your revenue engine</div>
+        <div class="callout-body">
+          Gate these behind a $4.99/month or $39/year subscription. The 5,000
+          limit bypass is your single highest-converting hook — surface the
+          upgrade prompt the exact moment a user hits the wall.
+        </div>
+      </div>
+
+      <div class="feat-block">
+        <div class="feat-header">
+          <div class="fh">Feature</div>
+          <div class="fh">Build Method</div>
+          <div class="fh">Tier</div>
+          <div class="fh">Implementation Notes</div>
+        </div>
+
+        <div class="feat-row">
+          <div class="feat-name-col">
+            <div class="feat-name">Unlimited WL Beyond 5,000</div>
+            <div class="feat-desc">
+              YouTube hard-caps WL at 5,000. Store overflow in extension's own
+              IndexedDB. Show unified merged view. Users at the wall pay
+              immediately — highest conversion moment.
+            </div>
+            <div class="risk-row">
+              <div class="risk-dot" style="background: #16a34a"></div>
+              <span class="risk-text risk-low"
+                >Low risk — purely local storage, no API</span
+              >
+            </div>
+          </div>
+          <div class="feat-status">
+            <span class="status-pill sp-dom">DOM</span>
+          </div>
+          <div class="feat-tier"><span class="tier-tag tt-pro">Pro</span></div>
+          <div class="feat-impl">
+            Intercept "save to WL" when real WL count ≥ 5000. Store metadata
+            <code>{ videoId, title, channel, duration, savedAt }</code> in
+            <code>IndexedDB</code>. On WL page, render overflow items below
+            native list using injected DOM rows. Detect count via DOM element
+            count on <code>/playlist?list=WL</code>.
+          </div>
+        </div>
+
+        <div class="feat-row">
+          <div class="feat-name-col">
+            <div class="feat-name">Priority Queue + Drag-Drop Reorder</div>
+            <div class="feat-desc">
+              YouTube WL has no manual ordering. Drag-drop to reorder your WL
+              into a personal priority queue. Pin "watch next" videos to top.
+              Order persists.
+            </div>
+            <div class="risk-row">
+              <div class="risk-dot" style="background: #16a34a"></div>
+              <span class="risk-text risk-low"
+                >Low risk — all local, no API</span
+              >
+            </div>
+          </div>
+          <div class="feat-status">
+            <span class="status-pill sp-dom">DOM</span>
+          </div>
+          <div class="feat-tier"><span class="tier-tag tt-pro">Pro</span></div>
+          <div class="feat-impl">
+            Use <code>SortableJS</code> library on WL page DOM. Store custom
+            order array <code>[videoId, ...]</code> in
+            <code>chrome.storage.sync</code> (syncs across devices). On page
+            load, re-render list in stored order. Show pin icon on first video.
+            Handle YT re-renders via MutationObserver.
+          </div>
+        </div>
+
+        <div class="feat-row">
+          <div class="feat-name-col">
+            <div class="feat-name">WL Backup & Export</div>
+            <div class="feat-desc">
+              Export full WL as JSON or CSV — video IDs, titles, channels,
+              durations, dates. Import backup to restore. Protects against YT
+              wiping your list.
+            </div>
+            <div class="risk-row">
+              <div class="risk-dot" style="background: #16a34a"></div>
+              <span class="risk-text risk-low"
+                >Very low risk — entirely local</span
+              >
+            </div>
+          </div>
+          <div class="feat-status">
+            <span class="status-pill sp-dom">DOM</span>
+          </div>
+          <div class="feat-tier"><span class="tier-tag tt-pro">Pro</span></div>
+          <div class="feat-impl">
+            Scrape all video metadata from DOM on WL page. Build JSON/CSV in
+            memory. Trigger download via
+            <code>chrome.downloads.download()</code> with a Blob URL. Import:
+            parse file, cross-check with current WL, add missing videos via
+            internal endpoint. Simple, safe.
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── ARCHITECTURE ─── -->
+      <hr class="divider" />
+      <div class="chapter">
+        <div class="chapter-num">06</div>
+        <div class="chapter-title">Technical Architecture</div>
+        <div class="chapter-badge cb-both">Reference</div>
+      </div>
+
+      <div class="arch-grid">
+        <div class="arch-card">
+          <div class="arch-card-title">
+            <div class="arch-icon" style="background: #eff6ff">📄</div>
+            content_script.js
+          </div>
+          <ul class="arch-list">
+            <li>Runs inside <code>youtube.com</code> pages</li>
+            <li>DOM reading, MutationObserver, event listeners</li>
+            <li>Trusted Types policy for all DOM writes</li>
+            <li>Sends messages to background service worker</li>
+            <li>
+              Injected on: <code>/playlist?list=WL</code>, <code>/watch</code>,
+              <code>/</code>, <code>/results</code>
+            </li>
+          </ul>
+        </div>
+        <div class="arch-card">
+          <div class="arch-card-title">
+            <div class="arch-icon" style="background: #f5f3ff">⚙️</div>
+            service_worker.js
+          </div>
+          <ul class="arch-list">
+            <li>Manifest V3 background script</li>
+            <li>Handles <code>chrome.storage</code> reads/writes</li>
+            <li>Manages auth state for Pro features</li>
+            <li>Calls LemonSqueezy / Stripe webhook verification</li>
+            <li>No persistent state — event-driven only</li>
+          </ul>
+        </div>
+        <div class="arch-card">
+          <div class="arch-card-title">
+            <div class="arch-icon" style="background: #f0fdf4">🗄️</div>
+            Storage Strategy
+          </div>
+          <ul class="arch-list">
+            <li>
+              <code>chrome.storage.sync</code> → user prefs, sort order,
+              priority queue (100KB limit)
+            </li>
+            <li>
+              <code>chrome.storage.local</code> → firstSeen dates, stale flags
+              (no limit)
+            </li>
+            <li>
+              <code>IndexedDB</code> → overflow WL videos beyond 5k, full video
+              index
+            </li>
+            <li>No server-side storage in MVP</li>
+          </ul>
+        </div>
+        <div class="arch-card">
+          <div class="arch-card-title">
+            <div class="arch-icon" style="background: #fff7ed">🔌</div>
+            Popup UI
+          </div>
+          <ul class="arch-list">
+            <li>Built as <code>popup.html</code> — React or vanilla JS</li>
+            <li>Shows WL health dashboard stats</li>
+            <li>Houses session builder input</li>
+            <li>Settings panel (thresholds, sort prefs)</li>
+            <li>Pro upgrade CTA with Stripe link</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="callout green">
+        <div class="callout-title">
+          Trusted Types — build this right from day one
+        </div>
+        <div class="callout-body">
+          YouTube enforces Trusted Types since July 2024. Any
+          <code>element.innerHTML = rawString</code> will be blocked and
+          silently fail. Always use:
+          <code
+            >const p = trustedTypes.createPolicy('wl-ext', { createHTML: s => s
+            })</code
+          >
+          then <code>element.innerHTML = p.createHTML(yourMarkup)</code>.
+          Non-compliant extensions break on YouTube with no error shown to
+          users.
+        </div>
+      </div>
+
+      <!-- ─── SPRINT PLAN ─── -->
+      <hr class="divider" />
+      <div class="chapter">
+        <div class="chapter-num">07</div>
+        <div class="chapter-title">Build Sprint Plan</div>
+        <div class="chapter-badge cb-both">7 Weeks to Launch</div>
+      </div>
+
+      <div class="sprint-grid">
+        <div class="sprint-week active">Wk 1–2</div>
+        <div class="sprint-content">
+          <div class="sprint-title">
+            Foundation — Extension scaffold + core delete
+          </div>
+          <div class="feat-desc">
+            Set up Manifest V3 structure, content script injection, Trusted
+            Types policy, chrome.storage setup. Ship bulk delete and auto-remove
+            watched. Submit to Chrome Web Store (review takes 3–5 days).
+          </div>
+          <div class="sprint-items">
+            <span class="sprint-item mvp">MV3 scaffold</span>
+            <span class="sprint-item mvp">Bulk delete</span>
+            <span class="sprint-item mvp">Auto-remove watched</span>
+            <span class="sprint-item mvp">Trusted Types</span>
+            <span class="sprint-item mvp">Store submission</span>
+          </div>
+        </div>
+
+        <div class="sprint-week">Wk 3</div>
+        <div class="sprint-content">
+          <div class="sprint-title">
+            Filter + Sort + Search — Beat 90% of competitors
+          </div>
+          <div class="feat-desc">
+            Add channel filter with bulk-action combo, multi-column sort, and
+            in-WL search. At this point you're already the most complete free
+            extension in the market.
+          </div>
+          <div class="sprint-items">
+            <span class="sprint-item mvp">Channel filter</span>
+            <span class="sprint-item mvp">Sort (3 modes)</span>
+            <span class="sprint-item mvp">Search in WL</span>
+            <span class="sprint-item mvp">Filter + bulk combo</span>
+          </div>
+        </div>
+
+        <div class="sprint-week">Wk 4</div>
+        <div class="sprint-content">
+          <div class="sprint-title">
+            Stats Dashboard + Stale Detection — The "wow" moment
+          </div>
+          <div class="feat-desc">
+            Ship the WL health overview popup and stale video badges. Post to
+            r/youtube and r/chrome. This is the shareable moment — "my WL has 47
+            hours of content" screenshots go viral.
+          </div>
+          <div class="sprint-items">
+            <span class="sprint-item mvp">WL dashboard popup</span>
+            <span class="sprint-item mvp">firstSeen tracking</span>
+            <span class="sprint-item mvp">Stale badges</span>
+            <span class="sprint-item">Reddit launch</span>
+          </div>
+        </div>
+
+        <div class="sprint-week">Wk 5</div>
+        <div class="sprint-content">
+          <div class="sprint-title">
+            Quick-Add UX + Session Builder — Unique features
+          </div>
+          <div class="feat-desc">
+            Inject thumbnail WL buttons everywhere on YouTube. Add "Save
+            playlist to WL". Ship session builder. These are the features no
+            competitor has — prep Product Hunt listing.
+          </div>
+          <div class="sprint-items">
+            <span class="sprint-item mvp">Thumbnail WL button</span>
+            <span class="sprint-item mvp">Save playlist to WL</span>
+            <span class="sprint-item mvp">Session builder</span>
+          </div>
+        </div>
+
+        <div class="sprint-week">Wk 6</div>
+        <div class="sprint-content">
+          <div class="sprint-title">
+            Pro Tier — Paywall + 5k bypass + Priority Queue
+          </div>
+          <div class="feat-desc">
+            Integrate LemonSqueezy for payments. Gate Pro features. Build
+            IndexedDB overflow for 5k bypass. Ship drag-drop priority queue.
+            Launch $29 lifetime deal on Product Hunt.
+          </div>
+          <div class="sprint-items">
+            <span class="sprint-item pro">LemonSqueezy</span>
+            <span class="sprint-item pro">5k bypass</span>
+            <span class="sprint-item pro">Priority queue</span>
+            <span class="sprint-item pro">WL export</span>
+            <span class="sprint-item">Product Hunt</span>
+          </div>
+        </div>
+
+        <div class="sprint-week">Wk 7+</div>
+        <div class="sprint-content">
+          <div class="sprint-title">AI Grouping + Feedback Loop</div>
+          <div class="feat-desc">
+            Integrate Claude Haiku or transformers.js for on-device topic
+            clustering. Instrument which features convert free→pro. Double down
+            on what works. Plan v2 (cloud sync, cross-device).
+          </div>
+          <div class="sprint-items">
+            <span class="sprint-item pro">AI topic groups</span>
+            <span class="sprint-item">Conversion analytics</span>
+            <span class="sprint-item">v2 planning</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── RISKS ─── -->
+      <hr class="divider" />
+      <div class="chapter">
+        <div class="chapter-num">08</div>
+        <div class="chapter-title">Risk Register</div>
+        <div class="chapter-badge cb-both">Know Before You Build</div>
+      </div>
+
+      <div class="feat-block">
+        <div class="feat-header">
+          <div class="fh">Risk</div>
+          <div class="fh">Severity</div>
+          <div class="fh">Likelihood</div>
+          <div class="fh">Mitigation</div>
+        </div>
+
+        <div class="feat-row">
+          <div class="feat-name-col">
+            <div class="feat-name">YouTube DOM structure changes</div>
+            <div class="feat-desc">
+              YouTube updates HTML layout 2–4× per year. Selectors break
+              silently.
+            </div>
+          </div>
+          <div class="feat-status">
+            <span class="status-pill sp-caution">High impact</span>
+          </div>
+          <div class="feat-tier">
+            <span class="tier-tag tt-frepro">Certain</span>
+          </div>
+          <div class="feat-impl">
+            Use multiple fallback selectors. Set up automated Playwright test on
+            WL page. Budget for 1–2 emergency patches/year. Monitor YouTube's
+            design Twitter account.
+          </div>
+        </div>
+
+        <div class="feat-row">
+          <div class="feat-name-col">
+            <div class="feat-name">Trusted Types enforcement tightens</div>
+            <div class="feat-desc">
+              Google may tighten Trusted Types policy further, requiring
+              additional compliance work.
+            </div>
+          </div>
+          <div class="feat-status">
+            <span class="status-pill sp-dom">Low impact</span>
+          </div>
+          <div class="feat-tier"><span class="tier-tag tt-free">Low</span></div>
+          <div class="feat-impl">
+            Build Trusted Types compliance from day one — not as an
+            afterthought. Follow Chrome Extensions team blog for policy changes.
+          </div>
+        </div>
+
+        <div class="feat-row">
+          <div class="feat-name-col">
+            <div class="feat-name">Rate limiting on bulk delete</div>
+            <div class="feat-desc">
+              Deleting 500+ videos too fast may trigger CAPTCHA or temporary
+              account throttle.
+            </div>
+          </div>
+          <div class="feat-status">
+            <span class="status-pill sp-caution">Medium impact</span>
+          </div>
+          <div class="feat-tier">
+            <span class="tier-tag tt-frepro">Medium</span>
+          </div>
+          <div class="feat-impl">
+            Hard-cap at 2 deletions/second. Show progress bar with time
+            estimate. Add pause/resume. Alert user if CAPTCHA detected via DOM
+            watch.
+          </div>
+        </div>
+
+        <div class="feat-row">
+          <div class="feat-name-col">
+            <div class="feat-name">YouTube ToS grey area</div>
+            <div class="feat-desc">
+              ToS prohibits automated interactions. DOM manipulation by
+              extensions is a grey zone.
+            </div>
+          </div>
+          <div class="feat-status">
+            <span class="status-pill sp-dom">Low impact</span>
+          </div>
+          <div class="feat-tier">
+            <span class="tier-tag tt-free">Very Low</span>
+          </div>
+          <div class="feat-impl">
+            100+ extensions do exactly this (SponsorBlock, uBlock, PocketTube).
+            Google's Chrome team works with extension devs. Never automate
+            account-level actions at scale from a server. All actions must be
+            user-initiated.
+          </div>
+        </div>
+      </div>
+
+      <div
+        style="
+          margin-top: 60px;
+          text-align: center;
+          padding: 40px 0;
+          border-top: 1px solid var(--rule);
+        "
+      >
+        <div
+          style="
+            font-family: 'Fraunces', serif;
+            font-size: 22px;
+            font-weight: 300;
+            font-style: italic;
+            color: var(--ink-3);
+            margin-bottom: 8px;
+          "
+        >
+          Ready to build.
+        </div>
+        <div
+          style="
+            font-family: 'DM Mono', monospace;
+            font-size: 11px;
+            color: var(--ink-4);
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+          "
+        >
+          Watch Later Manager · Feature Spec v1.0 · March 2026
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer nav -->
+    <div class="doc-footer">
+      <div class="footer-brand">WL Manager · Spec v1.0</div>
+      <nav class="footer-nav">
+        <a
+          href="#"
+          onclick="window.scrollTo({top:0,behavior:'smooth'});return false"
+          >↑ Top</a
+        >
+        <a href="#" onclick="window.print();return false">Print / PDF</a>
+      </nav>
+    </div>
+  </body>
+</html>
